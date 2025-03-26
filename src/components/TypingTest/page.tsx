@@ -13,7 +13,10 @@ const TypingTest = () => {
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
 
   useEffect(() => {
-    fetchTypingText().then(setText);
+    fetchTypingText().then((fullText) => {
+      const words = fullText.split(" ").slice(0, 25).join(" "); // Limit to ~25 words
+      setText(words);
+    });
   }, []);
 
   useEffect(() => {
@@ -25,35 +28,24 @@ const TypingTest = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     const newChar = newValue[newValue.length - 1];
-    
+
     if (!startTime) setStartTime(Date.now());
 
-    // Update total keystrokes (including mistakes & backspaces)
     setTotalKeystrokes((prev) => prev + 1);
 
-    // Check if the typed character is correct
     if (newChar === text[newValue.length - 1]) {
       setCorrectChars((prev) => prev + 1);
     }
 
-    // Adjust accuracy to account for backspaces
     const newAccuracy = Math.round((correctChars / totalKeystrokes) * 100) || 0;
     setAccuracy(newAccuracy);
 
-    // Update input state
     setInput(newValue);
 
     // WPM Calculation
-    if (newValue === text) {
-      const endTime = Date.now();
-      const elapsedMinutes = (endTime - startTime!) / 60000;
-      const words = text.split(" ").length;
-      setWpm(Math.round(words / elapsedMinutes));
-    } else {
-      const elapsedMinutes = ((Date.now() - startTime!) / 60000) || 1;
-      const words = newValue.split(" ").length;
-      setWpm(Math.round(words / elapsedMinutes));
-    }
+    const elapsedMinutes = ((Date.now() - startTime!) / 60000) || 1;
+    const words = newValue.split(" ").length;
+    setWpm(Math.round(words / elapsedMinutes));
   };
 
   return (
@@ -68,8 +60,8 @@ const TypingTest = () => {
         autoFocus
       />
 
-      {/* Typing Test Text */}
-      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl overflow-hidden">
+      {/* Typing Text with Cursor */}
+      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl">
         {text.split("").map((char, index) => {
           let charClass = "text-gray-400"; // Default
 
@@ -79,14 +71,17 @@ const TypingTest = () => {
 
           return (
             <span key={index} className={`relative ${charClass}`}>
-              {/* Cursor Positioned BEFORE Next Character */}
               {index === input.length && (
-                <span className="absolute -left-[2px] bg-white w-[2px] h-6 inline-block animate-blink"></span>
+                <span className="absolute left-0 bg-white w-[2px] h-6 inline-block animate-blink"></span>
               )}
               {char === " " ? "\u00A0" : char}
             </span>
           );
         })}
+        {/* Cursor at the end if user finishes typing */}
+        {input.length === text.length && (
+          <span className="inline-block bg-white w-[2px] h-6 animate-blink"></span>
+        )}
       </div>
 
       {/* Real-time WPM & Accuracy */}
