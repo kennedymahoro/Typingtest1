@@ -69,14 +69,18 @@ const TypingTest = () => {
           let charClass = "text-gray-600"; // Default (upcoming text)
 
           if (index < input.length) {
-            charClass = input[index] === char ? "text-green-500" : "text-red-500"; // Correct or Incorrect
+            if (char === " ") {
+              charClass = input[index] === " " ? "text-green-500" : "bg-red-500 text-white px-2 rounded"; // Spaces
+            } else {
+              charClass = input[index] === char ? "text-green-500" : "text-red-500"; // Normal characters
+            }
           }
 
           return (
             <span key={index} className={`relative ${charClass} inline-block`}>
               {/* Cursor moves inline, appearing AFTER the typed character */}
               {index === input.length && (
-                <span className="absolute -right-[2px] bg-white w-[2px] h-6 inline-block animate-blink"></span>
+                <span className="absolute -bottom-[2px] -right-[2px] bg-white w-[3px] h-[1.4em] inline-block animate-blink"></span>
               )}
               {char === " " ? "\u00A0" : char}
             </span>
@@ -84,7 +88,7 @@ const TypingTest = () => {
         })}
         {/* Cursor at the end if user finishes typing */}
         {input.length === text.length && (
-          <span className="inline-block bg-white w-[2px] h-6 animate-blink"></span>
+          <span className="inline-block bg-white w-[3px] h-[1.4em] animate-blink"></span>
         )}
       </div>
 
