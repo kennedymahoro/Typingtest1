@@ -12,11 +12,20 @@ const TypingTest = () => {
   const [correctChars, setCorrectChars] = useState(0);
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
 
+  // Fetch a new quote
+  const loadNewQuote = async () => {
+    const newQuote = await fetchTypingText();
+    setText(newQuote);
+    setInput("");
+    setStartTime(null);
+    setWpm(0);
+    setAccuracy(100);
+    setCorrectChars(0);
+    setTotalKeystrokes(0);
+  };
+
   useEffect(() => {
-    fetchTypingText().then((fullText) => {
-      const words = fullText.split(" ").slice(0, 25).join(" "); // Limit to ~25 words
-      setText(words);
-    });
+    loadNewQuote(); // Load the initial quote on mount
   }, []);
 
   useEffect(() => {
@@ -49,10 +58,7 @@ const TypingTest = () => {
   };
 
   return (
-    <div
-      className="flex flex-col items-center justify-center h-screen w-screen px-4"
-      onClick={() => inputRef.current?.focus()}
-    >
+    <div className="flex flex-col items-center justify-center h-screen w-screen px-4">
       {/* Hidden Input */}
       <input
         ref={inputRef}
@@ -66,22 +72,21 @@ const TypingTest = () => {
       {/* Typing Text with Cursor */}
       <div className="w-full max-w-3xl text-left text-white font-mono text-2xl leading-relaxed">
         {text.split(" ").map((word, wordIndex) => (
-          <span key={wordIndex} className="inline-block mr-3"> {/* Ensures words stay on one line */}
+          <span key={wordIndex} className="inline-block mr-3">
             {word.split("").map((char, charIndex) => {
               const index = text.split("").slice(0, text.indexOf(word)).length + charIndex; // Get absolute index
               let charClass = "text-gray-600"; // Default (upcoming text)
 
               if (index < input.length) {
                 if (char === " ") {
-                  charClass = input[index] === " " ? "text-green-500" : "bg-red-500 text-white px-2 rounded"; // Spaces
+                  charClass = input[index] === " " ? "text-green-500" : "bg-red-500 text-white px-2 rounded";
                 } else {
-                  charClass = input[index] === char ? "text-green-500" : "text-red-500"; // Normal characters
+                  charClass = input[index] === char ? "text-green-500" : "text-red-500";
                 }
               }
 
               return (
                 <span key={charIndex} className={`relative ${charClass} inline-block mx-[2px]`}>
-                  {/* Cursor moves inline, appearing AFTER the typed character */}
                   {index === input.length && (
                     <span className="absolute -bottom-[2px] -right-[2px] bg-white w-[3px] h-[1.4em] inline-block animate-blink"></span>
                   )}
@@ -91,7 +96,6 @@ const TypingTest = () => {
             })}
           </span>
         ))}
-        {/* Cursor at the end if user finishes typing */}
         {input.length === text.length && (
           <span className="inline-block bg-white w-[3px] h-[1.4em] animate-blink"></span>
         )}
@@ -102,6 +106,14 @@ const TypingTest = () => {
         <p>WPM: {wpm}</p>
         <p>Accuracy: {accuracy}%</p>
       </div>
+
+      {/* New Quote Button */}
+      <button
+        onClick={loadNewQuote}
+        className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        New Quote
+      </button>
     </div>
   );
 };
