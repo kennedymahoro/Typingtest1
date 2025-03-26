@@ -49,7 +49,7 @@ const TypingTest = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen">
+    <div className="flex flex-col items-center justify-center h-screen w-screen px-4">
       {/* Hidden Input */}
       <input
         ref={inputRef}
@@ -61,7 +61,7 @@ const TypingTest = () => {
       />
 
       {/* Typing Text with Cursor */}
-      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl">
+      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl leading-relaxed">
         {text.split("").map((char, index) => {
           let charClass = "text-gray-400"; // Default
 
@@ -71,8 +71,9 @@ const TypingTest = () => {
 
           return (
             <span key={index} className={`relative ${charClass}`}>
+              {/* Cursor moves IN PLACE while typing */}
               {index === input.length && (
-                <span className="absolute left-0 bg-white w-[2px] h-6 inline-block animate-blink"></span>
+                <span className="absolute -right-[2px] bg-white w-[2px] h-6 inline-block animate-blink"></span>
               )}
               {char === " " ? "\u00A0" : char}
             </span>
