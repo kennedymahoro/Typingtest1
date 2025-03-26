@@ -27,14 +27,15 @@ const TypingTest = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const newChar = newValue[newValue.length - 1];
-
     if (!startTime) setStartTime(Date.now());
 
     setTotalKeystrokes((prev) => prev + 1);
 
-    if (newChar === text[newValue.length - 1]) {
-      setCorrectChars((prev) => prev + 1);
+    if (newValue.length > input.length) {
+      const newChar = newValue[newValue.length - 1];
+      if (newChar === text[newValue.length - 1]) {
+        setCorrectChars((prev) => prev + 1);
+      }
     }
 
     const newAccuracy = Math.round((correctChars / totalKeystrokes) * 100) || 0;
@@ -42,14 +43,16 @@ const TypingTest = () => {
 
     setInput(newValue);
 
-    // WPM Calculation
     const elapsedMinutes = ((Date.now() - startTime!) / 60000) || 1;
     const words = newValue.split(" ").length;
     setWpm(Math.round(words / elapsedMinutes));
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen px-4">
+    <div
+      className="flex flex-col items-center justify-center h-screen w-screen px-4"
+      onClick={() => inputRef.current?.focus()}
+    >
       {/* Hidden Input */}
       <input
         ref={inputRef}
@@ -61,17 +64,17 @@ const TypingTest = () => {
       />
 
       {/* Typing Text with Cursor */}
-      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl leading-relaxed">
+      <div className="w-full max-w-3xl text-left text-white font-mono text-2xl leading-relaxed break-words">
         {text.split("").map((char, index) => {
-          let charClass = "text-gray-400"; // Default
+          let charClass = "text-gray-600"; // Default (upcoming text)
 
           if (index < input.length) {
-            charClass = input[index] === char ? "text-green-500" : "text-red-500";
+            charClass = input[index] === char ? "text-green-500" : "text-red-500"; // Correct or Incorrect
           }
 
           return (
-            <span key={index} className={`relative ${charClass}`}>
-              {/* Cursor moves IN PLACE while typing */}
+            <span key={index} className={`relative ${charClass} inline-block`}>
+              {/* Cursor moves inline, appearing AFTER the typed character */}
               {index === input.length && (
                 <span className="absolute -right-[2px] bg-white w-[2px] h-6 inline-block animate-blink"></span>
               )}
