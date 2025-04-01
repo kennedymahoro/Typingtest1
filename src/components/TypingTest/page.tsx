@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState, useRef } from "react";
 import { fetchTypingText } from "../../../utils/api";
 
@@ -14,14 +14,20 @@ const TypingTest = () => {
 
   // Fetch a new quote
   const loadNewQuote = async () => {
-    const newQuote = await fetchTypingText();
-    setText(newQuote);
-    setInput("");
-    setStartTime(null);
-    setWpm(0);
-    setAccuracy(100);
-    setCorrectChars(0);
-    setTotalKeystrokes(0);
+    try {
+      const newQuote = await fetchTypingText();
+      setText(newQuote);
+      setInput("");
+      setStartTime(null);
+      setWpm(0);
+      setAccuracy(100);
+      setCorrectChars(0);
+      setTotalKeystrokes(0);
+      console.log("New Quote Loaded:", newQuote); // Log the new quote
+    } catch (error) {
+      console.error("Error loading new quote:", error); // Log any errors
+      alert("Failed to load new quote. Please try again."); // Alert the user
+    }
   };
 
   useEffect(() => {
